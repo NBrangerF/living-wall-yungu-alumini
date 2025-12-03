@@ -5,7 +5,7 @@ import { motion, AnimatePresence, type Variants } from 'framer-motion';
 const ALUMNI_FILES = Array.from({ length: 74 }).map((_, i) => `card_${i + 1}.png`);
 
 // Configuration
-const CYCLE_DURATION = 5000; // 5 seconds per shift
+const CYCLE_DURATION = 10000; // 10 seconds per shift
 // Aspect Ratio: 2135 x 850 (~2.51)
 // Scaled down by 2 for display: 1068 x 425
 const CARD_WIDTH = 1068; 
@@ -124,44 +124,29 @@ function DeckCard({ image, slot }: { image: string, slot: 'exit' | 'top' | 'midd
     }
   };
 
-  // Snappy Spring Transition
-  const springTransition = {
-    type: "spring" as const,
-    stiffness: 120,
-    damping: 20,
-    mass: 1
+  // Slow Cinematic Transition
+  const cinematicTransition: any = {
+    type: "tween",
+    duration: 4, // Extended to 4s for very slow, smooth movement
+    ease: "easeInOut"
   };
 
   // Dynamic Idle Animations
-  // Continuous Upward Motion: All cards drift up slowly during the 5s idle
+  // Removed Y-axis drift to prevent "jerk" on slot change
   const idleVariants: Variants = {
     middle: {
       scale: [1.0, 1.02], // Subtle breathing relative to parent scale
-      y: ['0%', '-8%'],   // Continuous slow upward drift
       transition: {
         scale: {
           duration: 5,
           ease: "easeInOut",
           repeat: Infinity,
           repeatType: "mirror"
-        },
-        y: {
-          duration: 5, // Matches cycle duration
-          ease: "linear", // Constant speed
-          repeat: Infinity,
-          // No repeatType mirror, we want it to reset or flow? 
-          // Actually, for continuous flow, it should just move up. 
-          // But since the slot changes, we just need it to move up *during* the slot time.
         }
       }
     },
     floating: {
-      y: ['0%', '-8%'], // Continuous slow upward drift for others too
-      transition: {
-        duration: 5,
-        ease: "linear",
-        repeat: Infinity
-      }
+      // No specific idle animation for others to ensure smooth slot transitions
     }
   };
 
@@ -176,7 +161,7 @@ function DeckCard({ image, slot }: { image: string, slot: 'exit' | 'top' | 'midd
       initial={false}
       animate={slot}
       variants={variants}
-      transition={springTransition}
+      transition={cinematicTransition}
     >
       {/* Inner Wrapper for Dynamic Idle */}
       <motion.div
